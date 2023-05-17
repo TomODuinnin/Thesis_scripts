@@ -1,0 +1,19 @@
+#Normalise VCF files
+
+parallel -j 12 ./bcftools-1.16/bcftools norm -f hs37d5.correct.fa -m -any -Oz -o LEAP_WGSv2.chr{}_head.norm.vcf.gz LEAP_WGSv2.chr{}_head.vcf.gz ::: {1..22} X Y
+
+#Set genotypes with read depth <10 and genotype quality <20 to missing
+
+for C in {1..22} X Y; do ./bcftools-1.16/bcftools +setGT LEAP_WGSv2.chr${C}_head.norm.vcf.gz -- -t q -n . -i 'FMT/DP<10 || FMT/GQ<20' > LEAP_WGSv2.chr${C}_head.QC.vcf.gz; done
+
+#Remove genotypes with <10% missingness 
+
+parallel -j 12 "./bcftools-1.16/bcftools view  -i  'F_PASS(FMT/DP>=10 & FMT/GT!=\"mis\")> 0.9' LEAP_WGSv2.chr{}_head.QC.vcf.gz -Oz -o  LEAP_WGSv2.chr{}_head.QC1.vcf.gz" ::: {1..22} X Y
+
+#Remove heterozygous genotypes with an allelic balance <20 
+
+parallel -j 12 "java -jar /home/shared/cathal/tools/picard.jar FilterVcf I=LEAP_WGSv2.chr{}_head.QC1.vcf.gz O=LEAP_WGSv2.chr{}_head.QC2.vcf.gz MIN_AB=0.2" ::: {1..22} X Y
+
+#Subset cohort to individuals of European descent
+
+parallel -j 12 "cut -f1 European_correct.txt | ./bcftools-1.16/bcftools view -S - LEAP_WGSv2.chr{}_head.QC2.vcf.gz --threads 8 --force-samples -O z -o LEAP_WGSv2.chr{}_european.vcf.gz" ::: {1..22} X Y
