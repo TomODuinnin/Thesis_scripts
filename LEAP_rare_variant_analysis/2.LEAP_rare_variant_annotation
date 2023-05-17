@@ -1,0 +1,7 @@
+#Annotate using VEP v107
+
+parallel -j 7 "ensembl-vep/vep -i LEAP_WGSv2.chr{}_european.vcf.gz --force_overwrite --vcf -o LEAP_WGSv2.chr{}_annotated.vcf.gz --assembly GRCh38 --fork 2 --offline --dir .vep --symbol --hgvs --numbers --canonical --per_gene --no_check_variants_order --plugin CADD,./whole_genome_SNVs.tsv.gz,./gnomad.genomes.r2.1.1.indel.tsv.gz --custom gnomad.exomes.r2.1.1.sites.vcf.bgz,gnomAD_v2_exome,vcf,exact,0,AF_nfe --plugin dbNSFP,./dbNSFP4.3a_grch37.gz,Ensembl_transcriptid,SIFT4G_score,Polyphen2_HDIV_score,MPC_score,REVEL_score,FATHMM_score,clinvar_id,clinvar_clnsig,clinvar_trait,clinvar_review,clinvar_hgvs,clinvar_var_source,clinvar_MedGen_id,clinvar_OMIM_id,clinvar_Orphanet_id,Interpro_domain,GTEx_V8_gene,GTEx_V8_tissue,Geuvadis_eQTL_target_gene" ::: {1..22} X Y
+
+#gzip annotated files 
+
+parallel -j 12 "gzip -c LEAP_WGSv2.chr{}_annotated.vcf.gz > LEAP_WGSv2.chr{}_anno.vcf.gz" ::: {1..22} X Y
