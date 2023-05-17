@@ -1,1 +1,120 @@
+#Below are the step-by-step commands for imputed-genotype quality control. 
+
+#Sample inclusion filter
+
+R v3.6.0
+
+library(data.table) 
+
+tmp <- fread("Included_cohort.txt")
+
+tmp2 <- tmp[,c(2,1)]
+
+write.table(tmp2, file= "Included_imputed_cohort.txt", quote=FALSE, row.names= FALSE, col.names=TRUE)
+
+
+PLINK v1.90b5
+
+plink --bfile LEAP_Imputed_May2020_PSC2 --keep Included_imputed_cohort.txt --make-bed --out LEAP_Imputed_May2020_PSC2_included
+
+
+#Imputation filter
+
+PLINK v2.0-alpha 
+
+plink2 --bfile LEAP_Imputed_May2020_PSC2_included --mach-r2-filter 0.8 2.0 --make-bed --out LEAP_Imputed_May2020_PSC2_imp #31 variants removed
+
+
+#Soft filter 1 - missing genotypes
+
+PLINK v1.90b5
+
+plink --bfile LEAP_Imputed_May2020_PSC2_imp --geno 0.10 --make-bed --out LEAP_Imputed_May2020_PSC2_soft
+
+
+#Hard filter 1 - maf and genotype missingness
+
+PLINK v1.90b5
+
+plink --bfile LEAP_Imputed_May2020_PSC2_soft --maf 0.01 --make-bed --out LEAP_Imputed_May2020_PSC2_hard1 
+
+plink --bfile LEAP_Imputed_May2020_PSC2_hard1 --geno 0.05 --make-bed --out LEAP_Imputed_May2020_PSC2_hard2 
+
+
+#Heterozygosity filter 
+
+PLINK v1.90b5
+
+plink --bfile LEAP_FreezeV3_1563_Imputed_May2020_PSC2_hard2 --het
+
+
+#Hardy-Weinberg Equilibrium filter
+
+plink --bfile LEAP_FreezeV3_1563_Imputed_May2020_PSC2_hard2 --pheno LEAP_carrier_status_impute_head.txt --pheno-name Carrier --hardy --make-bed --out LEAP_Imputed_May2020_PSC2_pheno
+
+
+#Remove problem SNPs from HWE filter
+
+R v3.6.0
+
+library(data.table)
+hardy = fread("LEAP_FreezeV3_1563_Imputed_May2020_PSC2_pheno.hwe") 
+
+hardy_carrier <- hardy[which(hardy$TEST == 'AFF'),]
+
+hardy_non_carrier <- hardy[which(hardy$TEST == 'UNAFF'),]
+
+hwe_prob_CNVcarrier = hardy_carrier[which(hardy_carrier$P <0.000000001),] 
+
+hwe_prob_nonCNVcarrier = hardy_non_carrier[which(hardy_non_carrier$P <0.000001),] 
+
+write.table(hwe_prob_CNVcarrier, file = "HWE_prob_carrier.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+write.table(hwe_prob_nonCNVcarrier, file = "HWE_prob_noncarrier.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+
+PLINK v1.90b5
+
+plink --bfile LEAP_Imputed_May2020_PSC2_pheno --keep IncludedCNVs_LIST_impute.txt --make-bed --out LEAP_Imputed_May2020_PSC2_carrier
+
+plink --bfile LEAP_Imputed_May2020_PSC2_pheno --keep IncludednonCNVs_LIST_impute.txt --make-bed --out LEAP_Imputed_May2020_PSC2_noncarrier 
+
+plink --bfile LEAP_Imputed_May2020_PSC2_carrier --exclude HWE_prob_carrier.txt --make-bed --out LEAP_Imputed_May2020_PSC2_carrier2
+
+plink --bfile LEAP_Imputed_May2020_PSC2_noncarrier --exclude HWE_prob_noncarrier.txt --make-bed --out LEAP_Imputed_May2020_PSC2_noncarrier2
+
+echo -e "LEAP_Imputed_May2020_PSC2_noncarrier2.bed" "LEAP_Imputed_May2020_PSC2_noncarrier2.bim" "LEAP_Imputed_May2020_PSC2_noncarrier2.fam" > LEAP_impute_mergelist.txt
+
+plink --bfile LEAP_Imputed_May2020_PSC2_carrier2 --merge-list LEAP_impute_mergelist.txt --make-bed --out LEAP_Imputed_May2020_PSC2_hwe
+
+
+
+#Soft filter 2 - missing genotypes
+
+PLINK v1.90b5
+
+plink --bfile LEAP_Imputed_May2020_PSC2_hwe --geno 0.10 --make-bed --out LEAP_Imputed_May2020_soft2
+
+
+#Hard filter 2 - maf and genotype missingness
+
+plink --bfile LEAP_Imputed_May2020_soft2 --maf 0.01 --make-bed --out LEAP_Imputed_May2020_hard 
+
+plink --bfile LEAP_Imputed_May2020_hard --geno 0.05 --make-bed --out LEAP_Imputed_May2020_final 
+
+
+#Recode Ped & Map files 
+
+plink --bfile LEAP_FreezeV3_1471_Imputed_May2020_final --recode --out LEAP_FreezeV3_1471_Imputed_May2020_final
+
+
+
+
+
+
+
+
+
+
+
 
