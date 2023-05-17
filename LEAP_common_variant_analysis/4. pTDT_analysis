@@ -1,0 +1,99 @@
+R v3.6.0
+
+library(data.table)
+library(effectsize)
+
+data <- fread("pTDT_dev_file.txt")
+
+tmp2 <- fread("LEAP_pTDT_carrier_parent_file.txt")
+
+tmp2 <- tmp2[which(tmp2$participant_id %in% data$participant_id),]
+
+
+#Calculate mid-parent PGS for full cohort
+
+tmp2$mid_parent_asd <- (as.numeric(unlist(tmp2[,"PS_ASD_Mother"])) + as.numeric(unlist(tmp2[,"PS_ASD_Father"])))/2
+
+
+tmp2$mid_parent_scz <- (as.numeric(unlist(tmp2[,"PS_SCZ_Mother"])) + as.numeric(unlist(tmp2[,"PS_SCZ_Father"])))/2
+
+
+tmp2$mid_parent_ed <- (as.numeric(unlist(tmp2[,"PS_Ed_Mother"])) + as.numeric(unlist(tmp2[,"PS_Ed_Father"])))/2
+
+
+tmp2$mid_parent_cog <- (as.numeric(unlist(tmp2[,"PS_Cog_Mother"])) + as.numeric(unlist(tmp2[,"PS_Cog_Father"])))/2
+
+
+tmp2$mid_parent_adhd <- (as.numeric(unlist(tmp2[,"PS_ADHD_Mother"])) + as.numeric(unlist(tmp2[,"PS_ADHD_Father"])))/2
+
+
+write.table(tmp2, file= "LEAP_pTDT_carrier_parent_file2.txt", quote=FALSE, row.names= FALSE, col.names=TRUE)
+
+#Subset 
+
+tmp_N <- tmp2[which((tmp2$phenotype2 == 2 | tmp2$phenotype2 == 4) & (tmp2$Carrier_Status == "FALSE") & ((!is.na(tmp2$PS_SCZ_Mother)) & (!is.na(tmp2$PS_SCZ_Father)))),]
+
+tmp_C <- tmp2[which((tmp2$phenotype2 == 2 | tmp2$phenotype2 == 4) & (tmp2$Carrier_Status == "TRUE") & ((!is.na(tmp2$PS_SCZ_Mother)) & (!is.na(tmp2$PS_SCZ_Father)))),]
+
+
+#Subset large tmp2 
+
+data <- fread("pTDT_dev_file.txt")
+
+Trio <- tmp2[which((tmp2$PS_ADHD_Mother != "NA") & (tmp2$participant_id %in% data$participant_id)),]
+
+
+
+#Autism
+
+pTDT_dev_ASD_Carrier <- ((tmp_C$PS_ASD) - tmp_C$mid_parent_asd)/sd(Trio$mid_parent_asd)
+
+t <- abs((mean(pTDT_dev_ASD_Carrier))/(sd(pTDT_dev_ASD_Carrier)/sqrt(NROW(pTDT_dev_ASD_Carrier))))
+
+pTDT_dev_ASD_nonCarrier <- ((tmp_N$PS_ASD) - tmp_N$mid_parent_asd)/sd(Trio$mid_parent_asd)
+
+t <- abs((mean(pTDT_dev_ASD_nonCarrier))/((sd(pTDT_dev_ASD_nonCarrier)/sqrt(NROW(pTDT_dev_ASD_nonCarrier)))))
+
+
+#Schizophrenia
+
+pTDT_dev_SCZ_Carrier <- ((tmp_C$PS_SCZ) - tmp_C$mid_parent_scz)/sd(Trio$mid_parent_scz)
+
+t <- abs((mean(pTDT_dev_SCZ_Carrier))/((sd(pTDT_dev_SCZ_Carrier)/sqrt(NROW(pTDT_dev_SCZ_Carrier)))))
+
+pTDT_dev_SCZ_nonCarrier <- ((tmp_N$PS_SCZ) - tmp_N$mid_parent_scz)/sd(Trio$mid_parent_scz)
+
+t <- abs((mean(pTDT_dev_SCZ_nonCarrier))/((sd(pTDT_dev_SCZ_nonCarrier)/sqrt(NROW(pTDT_dev_SCZ_nonCarrier)))))
+
+
+#Educational Attainment
+
+pTDT_dev_EA_Carrier <- ((tmp_C$PS_Ed) - tmp_C$mid_parent_ed)/sd(Trio$mid_parent_ed)
+
+t <- abs((mean(pTDT_dev_EA_Carrier))/(sd(pTDT_dev_EA_Carrier)/sqrt(NROW(pTDT_dev_EA_Carrier))))
+
+pTDT_dev_EA_nonCarrier <- ((tmp_N$PS_Ed) - tmp_N$mid_parent_ed)/sd(Trio$mid_parent_ed)
+
+t <- abs((mean(pTDT_dev_EA_nonCarrier))/((sd(pTDT_dev_EA_nonCarrier)/(sqrt(NROW(pTDT_dev_EA_nonCarrier)))))) 
+
+
+#Cognition
+
+pTDT_dev_Cog_Carrier <- ((tmp_C$PS_Cog) - tmp_C$mid_parent_cog)/sd(Trio$mid_parent_cog)
+
+t <- abs((mean(pTDT_dev_Cog_Carrier))/((sd(pTDT_dev_Cog_Carrier)/sqrt(NROW(pTDT_dev_Cog_Carrier)))))
+
+pTDT_dev_Cog_Carrier <- ((tmp_N$PS_Cog) - tmp_N$mid_parent_cog)/sd(Trio$mid_parent_cog)
+
+t <- abs((mean(pTDT_dev_Cog_Carrier))/(sd(pTDT_dev_Cog_Carrier)/sqrt(NROW(pTDT_dev_Cog_Carrier)))) 
+
+
+#ADHD 
+
+pTDT_dev_ADHD_Carrier <- ((tmp_C$PS_ADHD) - tmp_C$mid_parent_adhd)/sd(Trio$mid_parent_adhd)
+
+t <- abs((mean(pTDT_dev_ADHD_Carrier))/(sd(pTDT_dev_ADHD_Carrier)/sqrt(NROW(pTDT_dev_ADHD_Carrier)))) 
+
+pTDT_dev_ADHD_nonCarrier <- ((tmp_N$PS_ADHD) - tmp_N$mid_parent_adhd)/sd(Trio$mid_parent_adhd)
+
+t <- abs((mean(pTDT_dev_ADHD_nonCarrier))/(sd(pTDT_dev_ADHD_nonCarrier)/sqrt(NROW(pTDT_dev_ADHD_nonCarrier)))) 
