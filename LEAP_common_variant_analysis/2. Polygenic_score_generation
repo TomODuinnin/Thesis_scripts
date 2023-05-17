@@ -1,0 +1,148 @@
+#PGS for cognition
+
+Rscript prsice2.3.3.R --dir . \
+    --prsice PRS_2.3.3linux \
+    --base Davies2018_OPEN_DATASET_summary_tab.txt \
+    --target LEAP_Imputed_May2020_final_regression \
+    --a1 A1 \
+    --a2 A2 \
+    --bar-levels 1e-08,1e-07,1e-06,1e-05,1e-04,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1 \
+    --chr CHR \
+    --bp BP \
+    --no-default \
+    --snp SNP \
+    --clump-kb 500 \
+    --clump-p 1.000000 \
+    --clump-r2 0.100000 \
+    --pheno ID_phenotype_file.txt \
+    --ignore-fid \
+    --cov Covariate_file.txt \
+    --cov-col sex,age,Center,PC4,PC9,PC10,PC14,PC15,PC18,PC20 \
+    --cov-factor sex,Center \
+    --seed 2144384906 \
+    --out LEAP_cog_regression_thresholds \
+    --stat BETA \
+    --pvalue P \
+    --binary-target T \
+    --fastscore \
+    --ultra \
+    --no-full
+    
+#PGS for Educational Attainment 
+
+Rscript prsice2.3.3.R --dir . \
+    --prsice PRS_2.3.3linux \
+    --base EA4_additive_excl_23andMe_tab.txt \
+    --target LEAP_Imputed_May2020_final_regression \
+    --a1 Effect_allele \
+    --a2 Other_allele \
+    --bar-levels 1e-08,1e-07,1e-06,1e-05,1e-04,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1 \
+    --chr Chr \
+    --bp BP \
+    --no-default \
+    --snp rsID \
+    --clump-kb 500 \
+    --clump-p 1.000000 \
+    --clump-r2 0.100000 \
+    --pheno ID_phenotype_file.txt \
+    --cov Covariate_file.txt \
+    --cov-col sex,age,Center,PC4,PC9,PC10,PC14,PC15,PC18,PC20 \
+    --cov-factor sex,Center \
+    --seed 2144384906 \
+    --out LEAP_ed_regression_thresholds \
+    --stat Beta \
+    --pvalue P \
+    --binary-target T \
+    --fastscore \
+    --ultra \
+    --no-full
+    
+    
+#PGS for Autism   
+
+Rscript prsice2.3.3.R --dir . \
+    --prsice PRS_2.3.3linux \
+    --base iPSYCH-PGC_ASD_Nov2017 \
+    --target LEAP_Imputed_May2020_final_regression \
+    --a1 A1 \
+    --a2 A2 \
+    --bar-levels 1e-08,1e-07,1e-06,1e-05,1e-04,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1 \
+    --chr CHR \
+    --bp BP \
+    --no-default \
+    --snp SNP \
+    --clump-kb 500 \
+    --clump-p 1.000000 \
+    --clump-r2 0.100000 \
+    --pheno Autism_phenotype_file.txt \
+    --cov Covariate_file.txt \
+    --cov-col sex,age,Center,PC4,PC9,PC10,PC14,PC15,PC18,PC20 \
+    --cov-factor sex,Center \
+    --seed 2144384906 \
+    --out LEAP_asd_regression \
+    --stat OR \
+    --pvalue P \
+    --binary-target T \
+    --fastscore \
+    --ultra \
+    --no-full
+
+#PGS for ADHD
+
+Rscript prsice2.3.3.R --dir . \
+    --prsice PRS_2.3.3linux \
+    --base pgc.cross.full.2013-03.txt \
+    --target LEAP_Imputed_May2020_final_regression \
+    --a1 A1 \
+    --a2 A2 \
+    --bar-levels 1e-08,1e-07,1e-06,1e-05,1e-04,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1 \
+    --chr CHROM \
+    --bp BP \
+    --no-default \
+    --snp ID \
+    --clump-kb 500 \
+    --clump-p 1.000000 \
+    --clump-r2 0.100000 \
+    --pheno Autism_phenotype_file.txt \
+    --cov Covariate_file.txt \
+    --cov-col sex,age,Center,PC4,PC9,PC10,PC14,PC15,PC18,PC20 \
+    --cov-factor sex,Center \
+    --seed 2144384906 \
+    --out LEAP_SCZ_regression \
+    --stat BETA \
+    --pvalue PVAL \
+    --binary-target T \
+    --fastscore \
+    --ultra \
+    --no-full
+
+
+#PGS for Schizophrenia
+
+Rscript prsice2.3.3.R --dir . \
+    --prsice PRS_2.3.3linux \
+    --base PGC3_SCZ_wave3.european.autosome.public.v3.txt \
+    --target LEAP_Imputed_May2020_final_regression \
+    --a1 A1 \
+    --a2 A2 \
+    --bar-levels 1e-08,1e-07,1e-06,1e-05,1e-04,0.001,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1 \
+    --chr CHROM \
+    --bp BP \
+    --no-default \
+    --snp ID \
+    --clump-kb 500 \
+    --clump-p 1.000000 \
+    --clump-r2 0.100000 \
+    --pheno Autism_phenotype_file.txt \
+    --cov Covariate_file.txt \
+    --cov-col ssex,age,Center,PC4,PC9,PC10,PC14,PC15,PC18,PC20 \
+    --cov-factor sex,Center \
+    --seed 2144384906 \
+    --out LEAP_SCZ_regression \
+    --stat BETA \
+    --pvalue PVAL \
+    --binary-target T \
+    --fastscore \
+    --ultra \
+    --no-full
+
