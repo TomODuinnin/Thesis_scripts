@@ -1,0 +1,31 @@
+R v3.6.0
+
+library(data.table) 
+library(plyr)
+library(car)
+library(fmsb) 
+
+data <- fread("Logistic_regression_file.txt")
+
+
+#Logistic regression formula
+
+logistic <- glm(formula = NDD ~ Carrier_Status + total_sfari_count + total_DDD_count + total_lof_count + scale(PS_Cog) + scale(PS_Ed) + scale(PS_ASD) + scale(PS_SCZ) + scale(PS_ADHD) + sex + scale(age) + Center + scale(PC4) + scale(PC9) + scale(PC10) + scale(PC14) + scale(PC15) + scale(PC18) + scale(PC20), data = data, family = binomial)
+
+summary(logistic)
+
+#Check multi-collinearity
+
+car::vif(logistic)
+
+#calculate confidence intervals 
+
+confint(logistic)
+
+#Calculate pseudo-R
+
+NagelkerkeR2(logistic)
+
+#Caclculate odds ratios
+
+exp(coef(logistic))
